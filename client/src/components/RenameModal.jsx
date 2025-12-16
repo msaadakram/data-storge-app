@@ -22,7 +22,7 @@ function RenameModal({ file, onClose, onSuccess }) {
         setError('')
 
         try {
-            const response = await axios.put(`/api/files/${file.id}/rename`, {
+            const response = await axios.put(`/api/files/[id]?id=${file.id}`, {
                 newName: newName.trim()
             })
 

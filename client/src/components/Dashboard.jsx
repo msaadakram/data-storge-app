@@ -129,7 +129,7 @@ function Dashboard({ onLogout }) {
 
     const handleDownload = async (fileId) => {
         try {
-            const response = await axios.get(`/api/files/download/${fileId}`)
+            const response = await axios.get(`/api/files/download?id=${fileId}`)
             if (response.data.success) {
                 const link = document.createElement('a')
                 link.href = response.data.url
@@ -148,7 +148,7 @@ function Dashboard({ onLogout }) {
         if (!confirm('Are you sure you want to delete this file?')) return
 
         try {
-            const response = await axios.delete(`/api/files/${fileId}`)
+            const response = await axios.delete(`/api/files/[id]?id=${fileId}`)
             if (response.data.success) {
                 setFiles(prev => prev.filter(f => f.id !== fileId))
                 setSelectedFiles(prev => prev.filter(id => id !== fileId))
@@ -165,7 +165,7 @@ function Dashboard({ onLogout }) {
         let deleted = 0
         for (const fileId of selectedFiles) {
             try {
-                await axios.delete(`/api/files/${fileId}`)
+                await axios.delete(`/api/files/[id]?id=${fileId}`)
                 deleted++
             } catch (error) {
                 console.error('Failed to delete:', fileId)
@@ -179,7 +179,7 @@ function Dashboard({ onLogout }) {
 
     const handlePreview = async (fileId) => {
         try {
-            const response = await axios.get(`/api/files/preview/${fileId}`)
+            const response = await axios.get(`/api/files/preview?id=${fileId}`)
             if (response.data.success) {
                 setPreviewFile({
                     id: fileId,
