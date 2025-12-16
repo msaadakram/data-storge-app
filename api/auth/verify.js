@@ -1,5 +1,5 @@
-const connectDB = require('./_lib/db');
-const Password = require('./_lib/models/Password');
+const connectDB = require('../_lib/db');
+const Password = require('../_lib/models/Password');
 
 module.exports = async (req, res) => {
     // Enable CORS
