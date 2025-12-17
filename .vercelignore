@@ -1,0 +1,60 @@
+# .vercelignore
+# Ignore files and directories that should not be uploaded to Vercel
+
+# Local development files
+node_modules
+.env
+.env.local
+.env.*.local
+
+# Local MongoDB data
+data/
+*.db
+
+# Build artifacts (will be built on Vercel)
+client/dist
+client/build
+dist
+build
+
+# Server file (not used in Vercel - we use serverless functions)
+server.js
+
+# Startup scripts for local development
+start.sh
+start.bat
+
+# Documentation (optional, but saves upload time)
+# README.md
+# QUICKSTART.md
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage
+.nyc_output
+
+# Temporary files
+tmp
+temp
+*.tmp

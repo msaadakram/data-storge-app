@@ -7,7 +7,13 @@
     "start": "node server.js",
     "server": "node server.js",
     "client": "cd client && npm run dev",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "setup": "npm install && cd client && npm install && cd ..",
+    "build:client": "cd client && npm run build && cd ..",
+    "deploy:local": "npm run build:client && mkdir -p public && cp -r client/dist/* public/",
+    "vercel:dev": "vercel dev",
+    "vercel:deploy": "vercel",
+    "vercel:prod": "vercel --prod"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.450.0",
