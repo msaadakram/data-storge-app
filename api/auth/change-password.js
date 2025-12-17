@@ -1,5 +1,6 @@
 const connectDB = require('../_lib/db');
 const Password = require('../_lib/models/Password');
+const bcrypt = require('bcryptjs');
 
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -17,22 +18,32 @@ module.exports = async (req, res) => {
     try {
         await connectDB();
 
-        const { currentPassword, newPassword } = req.body;
+        // Handle string body if needed
+        const body = typeof req.body === 'string'
+            ? JSON.parse(req.body)
+            : req.body || {};
+
+        const { currentPassword, newPassword } = body;
 
         if (!currentPassword || !newPassword) {
             return res.status(400).json({ success: false, message: 'Both passwords required' });
         }
 
-        if (newPassword.length !== 4 || !/^\d{4}$/.test(newPassword)) {
+        if (!/^\d{4}$/.test(newPassword)) {
             return res.status(400).json({ success: false, message: 'New password must be 4 digits' });
         }
 
         const storedPassword = await Password.findOne();
-        if (!storedPassword || storedPassword.password !== currentPassword) {
+        if (!storedPassword) {
+            return res.status(500).json({ success: false, message: 'Password not configured' });
+        }
+
+        const isMatch = await bcrypt.compare(currentPassword, storedPassword.password);
+        if (!isMatch) {
             return res.status(401).json({ success: false, message: 'Current password is incorrect' });
         }
 
-        storedPassword.password = newPassword;
+        storedPassword.password = await bcrypt.hash(newPassword, 10);
         await storedPassword.save();
 
         return res.json({ success: true, message: 'Password changed successfully' });

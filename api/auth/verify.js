@@ -1,5 +1,6 @@
 const connectDB = require('../_lib/db');
 const Password = require('../_lib/models/Password');
+const bcrypt = require('bcryptjs');
 
 module.exports = async (req, res) => {
     // CORS
@@ -21,10 +22,10 @@ module.exports = async (req, res) => {
     try {
         await connectDB();
 
-        // ⚠️ Ensure body exists (important for deployment)
+        // Ensure body exists (handle string body on some deployments)
         const body = typeof req.body === 'string'
             ? JSON.parse(req.body)
-            : req.body;
+            : req.body || {};
 
         const { password } = body;
 
@@ -36,18 +37,19 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Get stored password
+        // Get stored password (single document)
         let storedPassword = await Password.findOne();
 
-        // First-time setup
+        // First-time setup (no password document yet)
         if (!storedPassword) {
             const defaultPassword = process.env.DEFAULT_PASSWORD || '1234';
+            const hashed = await bcrypt.hash(defaultPassword, 10);
 
             storedPassword = await Password.create({
-                password: defaultPassword
+                password: hashed
             });
 
-            // If user is logging in with default password
+            // Allow login if user enters the default password
             if (password === defaultPassword) {
                 return res.status(200).json({
                     success: true,
@@ -61,8 +63,9 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Compare password
-        if (storedPassword.password !== password) {
+        // Compare password using bcrypt (works with existing hashed passwords)
+        const isMatch = await bcrypt.compare(password, storedPassword.password);
+        if (!isMatch) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid password'
