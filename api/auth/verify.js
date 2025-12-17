@@ -63,7 +63,22 @@ module.exports = async (req, res) => {
             });
         }
 
-        // Compare password using bcrypt (works with existing hashed passwords)
+        // If the stored password looks like a legacy plain 4-digit PIN, support it
+        if (/^\d{4}$/.test(storedPassword.password)) {
+            if (storedPassword.password === password) {
+                return res.status(200).json({
+                    success: true,
+                    message: 'Authentication successful'
+                });
+            }
+
+            return res.status(401).json({
+                success: false,
+                message: 'Invalid password'
+            });
+        }
+
+        // Otherwise expect bcrypt hash (current behavior)
         const isMatch = await bcrypt.compare(password, storedPassword.password);
         if (!isMatch) {
             return res.status(401).json({
